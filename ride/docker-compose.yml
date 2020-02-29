@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  users:
+    build: .
+    container_name: rides
+    command: python rides.py
+    ports:
+        - "8000:5000"
+
+ 

@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  users:
+    build: .
+    container_name: users
+    command: python users.py
+    ports:
+        - "8080:5000"
