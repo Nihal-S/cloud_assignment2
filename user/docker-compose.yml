@@ -3,7 +3,8 @@ version: '2'
 services:
   users:
     build: .
+    image: user:latest
     container_name: users
     command: python users.py
     ports:
-        - "8080:5000"
+        - "8080:80"

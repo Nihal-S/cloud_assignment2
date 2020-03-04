@@ -62,14 +62,14 @@ def add():
         name = request.json['username']
         password = request.json['password']
         insert = "'"+name+"','"+password+"'"
-        names = requests.post('http://127.0.0.1:5000/api/v1/db/read', json={"table": "users","columns":"username","where":"username!='hdughuhuhfguihufdhuidhgfuhduhgiu'"})
+        names = requests.post('http://127.0.0.1:80/api/v1/db/read', json={"table": "users","columns":"username","where":"username!='hdughuhuhfguihufdhuidhgfuhduhgiu'"})
         names = names.json()
         l = []
         for i in names:
             l.append(i[0])
         names = l
         if(len(password) == 40 and if_hex(password) and name not in names):
-            requests.post('http://127.0.0.1:5000/api/v1/db/write', json={"insert": insert,"column":"username,password","table":"users","what":"insert"})
+            requests.post('http://127.0.0.1:80/api/v1/db/write', json={"insert": insert,"column":"username,password","table":"users","what":"insert"})
             res = jsonify()
             #res.statuscode = 201
             return res, 201
@@ -88,7 +88,7 @@ def add():
 def delete(name):
     try:
         name = str(name)
-        names = requests.post('http://127.0.0.1:5000/api/v1/db/read', json={"table": "users","columns":"username","where":"username!='hdughuhuhfguihufdhuidhgfuhduhgiu'"})
+        names = requests.post('http://127.0.0.1:80/api/v1/db/read', json={"table": "users","columns":"username","where":"username!='hdughuhuhfguihufdhuidhgfuhduhgiu'"})
         names = names.json()
         l = []
         for i in names:
@@ -98,7 +98,7 @@ def delete(name):
         print(names)
         if(name in names):
             print("username='"+name+"'")
-            requests.post('http://127.0.0.1:5000/api/v1/db/write', json={"insert": "username='"+name+"'","column":"","table":"users","what":"delete"})
+            requests.post('http://127.0.0.1:80/api/v1/db/write', json={"insert": "username='"+name+"'","column":"","table":"users","what":"delete"})
             res = jsonify()
             # res.statuscode = 201
             return res, 200
@@ -116,7 +116,7 @@ def delete(name):
 @app.route('/api/v1/users', methods=['GET'])
 def list_all_users():
     try:
-        users = requests.post('http://127.0.0.1:5000/api/v1/db/read', json={"table":"users","columns":"username","where":"username!='wdjfuhwiufhwihfhwjhf'"})
+        users = requests.post('http://127.0.0.1:80/api/v1/db/read', json={"table":"users","columns":"username","where":"username!='wdjfuhwiufhwihfhwjhf'"})
         users = users.json()
         l = [i[0] for i in users]
         if(len(l) == 0):
@@ -148,4 +148,4 @@ def clear_db():
 
 if __name__ == '__main__':
 	app.debug=True    
-	app.run(host="0.0.0.0")
+	app.run(host="0.0.0.0", port=80)
