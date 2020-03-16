@@ -6,6 +6,9 @@ import string
 import datetime
 app = Flask(__name__)
 
+
+count = 0
+
 def validate(date_text):
     try:
         datetime.datetime.strptime(date_text, '%d-%m-%Y:%S-%M-%H')
@@ -59,6 +62,7 @@ def read():
 
 @app.route('/api/v1/rides', methods=['POST'])
 def create_ride():
+    count += 1
     try:
         created_by = request.json['created_by']
         timestamp = request.json['timestamp']
@@ -112,6 +116,7 @@ def create_ride():
 
 @app.route('/api/v1/rides', methods=['GET'])
 def upcoming_ride():
+    count += 1
     try:
         if request.method == "GET":
             source = request.args.get('source')
@@ -152,6 +157,7 @@ def upcoming_ride():
 
 @app.route('/api/v1/rides/<string:ride_id>', methods=['GET'])
 def list_rides(ride_id):
+    count += 1
     try:
         ride_id = str(ride_id)  
         ride_ids = requests.post('http://127.0.0.1:80/api/v1/db/read', json={"table": "ride","columns":"ride_id","where":"source!='hasdfuhuhasujdhjkh'"})
@@ -195,6 +201,7 @@ def list_rides(ride_id):
 
 @app.route('/api/v1/rides/<string:ride_id>', methods=['POST'])
 def join_rides(ride_id):
+    count += 1
     try:
         ride_id = str(ride_id)
         ride_ids = requests.post('http://127.0.0.1:80/api/v1/db/read', json={"table": "ride","columns":"ride_id","where":"ride_id!='2341356'"})
@@ -237,6 +244,7 @@ def join_rides(ride_id):
 
 @app.route('/api/v1/rides/<string:ride_id>', methods=['DELETE'])
 def delete_ride(ride_id):
+    count += 1
     try:
         ride_id = str(ride_id)
         ride_ids = requests.post('http://127.0.0.1:80/api/v1/db/read', json={"table": "ride","columns":"ride_id","where":"ride_id!='2341356'"})
@@ -264,6 +272,7 @@ def delete_ride(ride_id):
 
 @app.route('/api/v1/db/clear', methods=['POST'])
 def clear_db():
+    count += 1
     try:
         conn = sqlite3.connect('Rides.db')
         c = conn.cursor()
@@ -280,7 +289,45 @@ def clear_db():
         res = jsonify
         return res, 500
 
+@app.route('/api/v1/_count', methods=['GET'])
+def count():
+    try:
+        res = count
+        return res,200
+    except Exception as e:
+        print(e)
+        res = jsonify
+        return res,500
 
+
+@app.route('/api/v1/_count', methods=['DELETE'])
+def count_reset():
+    try:
+        count = 0
+        res = jsonify()
+        return res,200
+    except Exception as e:
+        print(e)
+        res = jsonify
+        return res,500
+
+
+@app.route('/api/v1/rides/count', methods=['GET'])
+def ride_count():
+    count += 1
+    try:
+        conn = sqlite3.connect('Rides.db')
+        c = conn.cursor()
+        query = "SELECT COUNT(*) FROM ride"
+        c.execute(query)
+        conn.commit()
+        conn.close()
+        res = jsonify()
+        return res, 200                
+    except Exception as e:
+        print(e)
+        res = jsonify()
+        return res,500
 
 if __name__ == '__main__':
 	app.debug=True    
