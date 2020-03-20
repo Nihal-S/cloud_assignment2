@@ -6,7 +6,7 @@ import string
 import datetime
 app = Flask(__name__)
 
-
+global count
 count = 0
 
 def validate(date_text):
@@ -62,8 +62,8 @@ def read():
 
 @app.route('/api/v1/rides', methods=['POST'])
 def create_ride():
-    count += 1
-    try:
+        global count
+        count += 1
         created_by = request.json['created_by']
         timestamp = request.json['timestamp']
         source = request.json['source']
@@ -108,14 +108,10 @@ def create_ride():
             res = jsonify()
             # res.statuscode = 400
             return res, 400
-    except Exception as e:
-        print(e)
-        res = jsonify()
-        # res.statuscode = 500
-        return res, 500
 
 @app.route('/api/v1/rides', methods=['GET'])
 def upcoming_ride():
+    global count
     count += 1
     try:
         if request.method == "GET":
@@ -157,6 +153,7 @@ def upcoming_ride():
 
 @app.route('/api/v1/rides/<string:ride_id>', methods=['GET'])
 def list_rides(ride_id):
+    global count 
     count += 1
     try:
         ride_id = str(ride_id)  
@@ -201,6 +198,7 @@ def list_rides(ride_id):
 
 @app.route('/api/v1/rides/<string:ride_id>', methods=['POST'])
 def join_rides(ride_id):
+    global count 
     count += 1
     try:
         ride_id = str(ride_id)
@@ -244,6 +242,7 @@ def join_rides(ride_id):
 
 @app.route('/api/v1/rides/<string:ride_id>', methods=['DELETE'])
 def delete_ride(ride_id):
+    global count 
     count += 1
     try:
         ride_id = str(ride_id)
@@ -272,7 +271,6 @@ def delete_ride(ride_id):
 
 @app.route('/api/v1/db/clear', methods=['POST'])
 def clear_db():
-    count += 1
     try:
         conn = sqlite3.connect('Rides.db')
         c = conn.cursor()
@@ -290,9 +288,11 @@ def clear_db():
         return res, 500
 
 @app.route('/api/v1/_count', methods=['GET'])
-def count():
+def count_l():
     try:
-        res = count
+        res = []
+        res.append(count)
+        res = str(res)
         return res,200
     except Exception as e:
         print(e)
@@ -303,6 +303,7 @@ def count():
 @app.route('/api/v1/_count', methods=['DELETE'])
 def count_reset():
     try:
+        global count
         count = 0
         res = jsonify()
         return res,200
@@ -314,6 +315,7 @@ def count_reset():
 
 @app.route('/api/v1/rides/count', methods=['GET'])
 def ride_count():
+    global count
     count += 1
     try:
         conn = sqlite3.connect('Rides.db')

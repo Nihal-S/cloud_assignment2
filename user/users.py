@@ -6,6 +6,7 @@ import string
 import datetime
 app = Flask(__name__)
 
+global count
 count = 0
 
 def validate(date_text):
@@ -60,6 +61,7 @@ def read():
 
 @app.route('/api/v1/users', methods=['PUT'])
 def add():
+    global count
     count += 1
     try:
         name = request.json['username']
@@ -89,6 +91,7 @@ def add():
 
 @app.route('/api/v1/users/<string:name>', methods=['DELETE'])
 def delete(name):
+    global count
     count += 1
     try:
         name = str(name)
@@ -119,6 +122,7 @@ def delete(name):
 
 @app.route('/api/v1/users', methods=['GET'])
 def list_all_users():
+    global count
     count += 1
     try:
         users = requests.post('http://127.0.0.1:80/api/v1/db/read', json={"table":"users","columns":"username","where":"username!='wdjfuhwiufhwihfhwjhf'"})
@@ -136,7 +140,6 @@ def list_all_users():
 
 @app.route('/api/v1/db/clear', methods=['POST'])
 def clear_db():
-    count += 1
     try:
         conn = sqlite3.connect('Users.db')
         c = conn.cursor()
@@ -153,16 +156,29 @@ def clear_db():
 
 
 @app.route('/api/v1/_count', methods=['GET'])
-def count():
+def count_l():
     try:
-        res = count
+        res = []
+        res.append(count)
+        res = str(res)
         return res,200
     except Exception as e:
         print(e)
         res = jsonify
         return res,500
 
+@app.route('/api/v1/_count', methods=['DELETE'])
+def count_reset():
+    try:
+        global count
+        count = 0
+        res = jsonify()
+        return res,200
+    except Exception as e:
+        print(e)
+        res = jsonify
+        return res,500
 
 if __name__ == '__main__':
 	app.debug=True    
-	app.run(host="0.0.0.0", port=80)
+	app.run( host="0.0.0.0",port=80)
